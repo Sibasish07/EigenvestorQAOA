@@ -10,7 +10,7 @@ The complexity inherent in this pursuit stems from the dual imperative of identi
 
 
 Accurately predicting the stock market in real-time is an arduous feat, compounded by the vast volume of data and the influence of unpredictable external factors. 
-Variables such as geopolitical events, natural disasters, or economic crises can dramatically impact market dynamics, defying traditional quantification methods.
+Variables such as geopolitical events, natural disasters, or economic crises can dramatically impact market dynamics, defying traditional quantification methods. 
 
 ## Motivation
 
@@ -112,8 +112,10 @@ To use the code provided in this repository, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Install the required dependencies specified in `requirements.txt`.
-3. Run the main script `main.py` to execute the QAOA algorithm for portfolio optimization.
-4. Adjust parameters and experiment with different settings as needed.
+3. Paste in the main.py file the covariance matrix and returns vector of the desired set of stocks (an example of covariance matrix can be found in the Sigma.csv file)
+
+In this repository we provide some examples of the usage of the code:
+The QAOA_circuit example.ipynb notebook builds a symbolic implementation of the QAOA circuit for soft and hard constraints for the selected values of the circuit parameters beta and gamma. In Grid Search.ipynb we illustrate how Grid Search can be used to find the optimal parameters beta and gamma. Finally, in QAOA Comparison.ipynb, we build QAOA circuits with both soft and hard constraints and circuit depths one or two, and extract the best combination found, benchmarking it with a brute force approach.
 
 ## Results
 
