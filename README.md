@@ -22,10 +22,84 @@ Subsequently, this foundational understanding will serve as a springboard for ex
 
 The implementation is done using Python programming language and leveraging the circ library for quantum computing. The key components of the implementation include:
 
-- Construction of the portfolio optimization problem as a binary optimization task.
+- Formulation of the Cost Function
+The Portfolio Selection problem can be formulated as an optimization problem in which we aim to minimize a cost function of the form:
+
+$$
+C(\mathbf{z}) = \lambda\mathbf{z}^T\sigma\mathbf{z}-(1-\lambda)\mathbf{\mu \cdot z}
+$$
+
+Where $\mathbf{\mu}$ is the returns vector and $\sigma$ is the covariance matrix of the stocks. The vector $\mathbf{z}$ indicates which operation shall be performed for each stock.
+
 - Encoding the problem into a suitable form for quantum computation.
-- Utilizing Qiskit's QAOA module to perform the optimization.
-- Post-processing and analysis of the obtained results.
+Performing a 2-spin encoding of $z_i$
+
+$$
+z_i = \frac{s_i^+-s_i^-}{2} \quad ; \quad s_i^+, s_i^- \in \{-1,+1\}
+$$
+
+Leading to the cost function:
+
+$$
+C_{RR}(\mathbf{s}) = \lambda\sum_{i=1}^{N}\sum_{j=1}^N\frac{\sigma_{ij}}{4}\left(s_i^+s_j^+-s_i^+s_j^--s_i^-s_j^++s_i^-s_j^-\right) 
+    - \left(1-\lambda\right)\sum_{i=1}^N\frac{\mu_i}{2}\left(s_i^+-s_i^-\right)
+$$
+
+The cost function has two components involving the risk and the returns expressed in gate notation:
+
+$$
+U_{C, risk} = \prod_{i, j} R_{Z_i^{+} Z_j^{+}}\left(-\frac{1}{2} \lambda \gamma \sigma_{i j}\right) R_{Z_i^{+} Z_j^{-}}\left(\frac{1}{2} \lambda \gamma \sigma_{i j}\right) R_{Z_i^{-} Z_j^{+}}\left(\frac{1}{2} \lambda \gamma \sigma_{i j}\right) R_{Z_i^{-} Z_j^{-}}\left(-\frac{1}{2} \lambda \gamma \sigma_{i j}\right)
+$$
+
+$$
+U_{C, returns} = \prod_{k=1}R_{Z_k^+}\left(\gamma(1-\lambda) \mu_{\mathrm{k}}\right)R_{Z_k^-}\left(-\gamma(1-\lambda) \mu_{\mathrm{k}}\right)
+$$
+
+- Construction of the mixer operator with Soft and Hard Constraints
+<!---
+Mixer Hamiltonian:
+
+$$
+B = \sum_{i=1}^N\sigma_i^x \quad \implies U_B(\beta) = e^{-i\beta H_M} = \prod_{i=1}^NR_X(2\beta) \quad \text{ (in gate notation)}
+$$
+
+QAOA with Soft constraints has the penalty function, which is added to the cost function for minimization:
+
+$$
+P(\mathbf{s})=\frac{A}{4}\left(s_i^{+} s_j^{+}-s_i^{+} s_j^{-}-s_i^{+} s_j^{+}+s_i^{-} s_j^{-}\right)-A D\left(s_j^{+}-s_j^{-}\right)+A D^2
+$$
+
+Where $A$ is the penalty scaling parameter, and $D$ is the net total of discrete lots to be invested.
+
+For the implementation, with the hard constraints, the initialized state is:
+
+$$
+\left|\psi_0\right\rangle=(|01\rangle)^{\otimes D} \otimes\left(\frac{1}{\sqrt{2}}|00\rangle+\frac{1}{\sqrt{2}}|11\rangle\right)^{\otimes(N-D)}
+$$
+
+With the mixer operator:
+
+$$
+U(B, \beta) = U(B_{odd}, \beta)U(B_{even}, \beta)U(B_{last}, \beta)
+$$
+
+where,
+
+$$
+B_{\text {odd }} = \sum_{a \hspace{1mm} odd}^{N-1}\sigma_a^x\sigma_{a+1}^x + \sigma_a^y\sigma_{a+1}^y
+$$
+
+$$
+B_{\text {even }} = \sum_{a\hspace{1mm}even}^{N}\sigma_a^x\sigma_{a+1}^x + \sigma_a^y\sigma_{a+1}^y
+$$
+
+$$
+B_{\text {last }} = \left\{\begin{array}{l}\sigma_N^x \sigma_1^x+\sigma_N^y \sigma_1^y, N \text { odd } \\
+I, N \text { even }\end{array}\right.
+$$
+-->
+
+- Using the cross-entropy classical optimization; Post-processing and analysis of results
 
 ## Dependencies and Usage
 
@@ -38,7 +112,7 @@ To use the code provided in this repository, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Install the required dependencies specified in `requirements.txt`.
-3. Run the main script `qaoa_portfolio_optimization.py` to execute the QAOA algorithm for portfolio optimization.
+3. Run the main script `main.py` to execute the QAOA algorithm for portfolio optimization.
 4. Adjust parameters and experiment with different settings as needed.
 
 ## Results
@@ -66,7 +140,7 @@ This project does not have a specific license. Use at your own discretion.
 
 ## Acknowledgements
 
-We would like to thank the developers of circ and other open-source libraries used in this project for their invaluable contributions to the field of quantum computing.
+We want to thank the developers of circ and other open-source libraries used in this project for their invaluable contributions to the field of quantum computing.
 
 ---
 
