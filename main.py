@@ -199,7 +199,7 @@ def grid_search(numpoints, numsim): # Inputs: number of values of beta and gamma
                     positions=z
     return positions, Cost_min
 
-def grid_search_2(numpoints, numsim): # performs grid search for p=2, returns the minimum cost function and best position
+def grid_search_2(numpoints, numsim): # performs grid search for depth (p)=2 for soft_constraints, returns the minimum cost function and best position
     Cost_min=100
     simulator = cirq.Simulator()
     positions=[]
@@ -224,7 +224,31 @@ def grid_search_2(numpoints, numsim): # performs grid search for p=2, returns th
                             positions=z
     return positions, Cost_min
 
-def grid_search_2_hard(numpoints, numsim): # performs grid search for p=2, returns the minimum cost function and best position
+def grid_search_hard(numpoints, numsim): # performs grid search for depth (p=1) for hard constraints, returns the minimum cost function and best position
+    Cost_min=100
+    simulator = cirq.Simulator()
+    positions=[]
+    betas= np.linspace(0, 2 * np.pi, numpoints)
+    gammas= np.linspace(0, 2 * np.pi, numpoints)
+    for beta in betas:
+        for gamma in gammas:
+            circuit=circuit_builder_p_hard([beta],[gamma])
+            for i in range(numsim):
+                result = simulator.run(circuit)
+                list=[]
+                z=[]
+                for value in result.measurements.values():
+                    list.append(value[0,0])
+                for i in range(N):
+                    z.append((list[2*i]-list[2*i+1]))
+                C=cost_function(z)
+                if C<Cost_min:
+                    Cost_min=C
+                    positions=z
+    return positions, Cost_min
+
+
+def grid_search_2_hard(numpoints, numsim): # performs grid search for depth (p)=2, returns the minimum cost function and best position
     Cost_min=100
     simulator = cirq.Simulator()
     positions=[]
@@ -249,7 +273,9 @@ def grid_search_2_hard(numpoints, numsim): # performs grid search for p=2, retur
                             positions=z
     return positions, Cost_min
 
+
 def brute_force_search(): #Gives exact solution through a brute force search. Returns the positions vector and minimum cost.
+    V=[-1,0,1] #Possible values of each positions vector element
     Cost_min= 100 #Initialize cost value.
     positions=[]
     z = np.zeros(4)
