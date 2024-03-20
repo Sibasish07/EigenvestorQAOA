@@ -248,3 +248,19 @@ def grid_search_2_hard(numpoints, numsim): # performs grid search for p=2, retur
                             Cost_min=C
                             positions=z
     return positions, Cost_min
+
+def brute_force_search(): #Gives exact solution through a brute force search. Returns the positions vector and minimum cost.
+    Cost_min= 100 #Initialize cost value.
+    positions=[]
+    z = np.zeros(4)
+    for g in V:
+        for h in V:
+            for i in V:
+                for j in V:
+                    z=[g,h,i,j]
+                    S=np.sum(z)
+                    C = lam*np.dot(z,np.dot(sigma,z))+A*(D-sum(z))**2-(1-lam)*np.dot(mu,z) #Define Cost function.
+                    if(C<Cost_min):
+                        Cost_min = C
+                        positions=z
+    return positions,Cost_min
